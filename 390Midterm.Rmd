@@ -1,0 +1,86 @@
+---
+title: "390Midterm"
+author: "Jillian Myler"
+date: "2024-03-21"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Introduction
+
+Access to healthcare is vital. When a loved one is unwell or injured, our instinct is to support them. Similarly, when our own health hinders our daily tasks, seeking treatment becomes necessary to improve our quality of life. Health influences the daily routines of everyone and especially impacts those facing injury or chronic illness. Therefore, access to healthcare is paramount in ensuring the well-being of individuals and communities. Further, the access to healthcare should not be influenced by an individual’s socioeconomic status. To give a concrete example of perpetuated socioeconomic disparity even within a publicly funded health care system (England) it is found that there is a 35% delta (43 days) between the most and least advantaged population groups in those seeking treatment for non-emergency coronary revascularization procedures ^[Moscelli G, Siciliani L, Gutacker N, Cookson R. Socioeconomic inequality of access to healthcare: Does choice explain the gradient? J Health Econ. 2018 Jan;57:290-314. doi: 10.1016/j.jhealeco.2017.06.005. Epub 2017 Jun 23. PMID: 28935158.].
+
+The paper I have chosen for this project examines disparities in wait times across socioeconomic groups for patients that are seeking treatment for non-emergency coronary revascularization procedures. Wait times for non-emergency situations are strong indicators of the barriers to access that still exist within a healthcare system that removes price as a factor. Thus, it is crucial to determine if there is a significant difference in wait times across socioeconomic groups, and what may be the root cause of such a difference in order to inform future policy decisions towards equitable access to healthcare. Within their study, the authors also take into consideration that the patient may also be making a choice that directly contributes to wait time differences. For example, when an individual chooses to forgo the hospital that is nearest to them and instead go to the next nearest hospital in an attempt to get either better service or a shorter wait time. Thus, the authors develop a metric that is meant to measure the differential distance between the closest and second closest provider. This distance metric is a strong predictor of the probability that the individual chooses to bypass the nearest hospital. The quantified probability of a patient’s choice to go to one hospital versus the other to seek treatment is meant to try and encapsulate how patient choice factors into the wait time differences; therefore, leaving the remaining differences in wait time to be explained by bias by the provider or disproportionate access existing for those of higher SES.  This project aims to both analyze and quantify where access to healthcare discrimination occurs based on socioeconomic status.
+ 
+
+## The Method
+
+In the baseline used within this paper (Moscelli et. al 2018)  aiming to assess the extent of repeated cross-sectional data of individuals undergoing coronary revascularization procedures, such as CABG surgery or PCI, is used.
+
+Their approach first employs a linear regression model with hospital fixed effects, estimated separately for each financial year and revascularization procedure. The model is defined as follows:
+
+\[ \ln(W_{ij}) = h_j + \beta_1 y_{ij} + \beta_2 s_{ij} + \beta_3 x_{ij} + \epsilon_{ij} \]
+
+Here, \( W_{ij} \) represents the waiting time of patient \( i \) in hospital \( j \), and \( y_{ij} \) denotes a vector of dummy variables representing socioeconomic status (SES), specifically measured by income deprivation in the patient's residential area. SES is categorized into quintiles, with the highest quintile serving as the reference category. The coefficients \( \beta_1 \) capture the impact of SES on waiting times, with positive values indicating income-related inequalities favoring the affluent.
+
+The vector \( s_{ij} \) includes severity controls such as age, gender, number of secondary diagnoses, previous hospital admissions, and Charlson comorbidities. These controls account for patients' latent health status, which may influence waiting times. Additionally, the vector \( x_{ij} \) incorporates non-severity variables like the month of admission.
+
+The hospital fixed effects \( h_j \) account for differences in waiting times among hospitals, capturing unobserved demand and supply factors such as infrastructure, staffing, and clinical quality. Consequently, \( \beta_1 \) should be interpreted as waiting time inequalities within a hospital, rather than across hospitals.
+
+The analysis focuses on socioeconomic inequalities within hospitals, as controlling for hospital fixed effects reveals minimal changes in waiting time gradients across hospitals in England. This indicates that waiting time inequalities predominantly arise within hospitals, rather than being driven by disparities in hospital access based on socioeconomic status. 
+
+However, since the authors are trying to define the influence of choice on wait times, they must also factor in how the patient choice between the two treatments may impact wait times. The Roy model regression, also known as the switching regression model, serves to address self-selection bias in observational data, particularly in situations where individuals make choices that affect the outcome being studied. Thus, a Roy model regression is used within this paper to fully understand the effect of patient choice. The  particular models used within their paper are described below.
+
+To model the choice of hospital,   a selection equation is introduced to capture the decision to bypass the closest hospital. \(n_{ij}\) is defined as a dummy variable equal to 1 if the patient bypasses the closest hospital and 0 otherwise. The Roy model for hospital choice is then formulated as:
+
+\[
+n_{ij} = I(0 < z_{ij} + \beta_1 y_{ij} + \beta_2 s_{ij} + \beta_3 x_{ij} + \epsilon_{ij} > 0)
+\]
+
+where \(n_{ij}\) takes values of either 0 or 1, representing the decision to bypass or not bypass the closest hospital. The observed log waiting times for patients selecting into non-closest or closest hospitals are denoted as \(w_{ij}^1\) and \(w_{ij}^0\) respectively, with \(w_{ij}^*\) representing the latent waiting time outcome for each patient before self-selection.
+
+The estimating equations for this model are formulated as follows:
+
+\[
+n_{ij} = I(0 < z_{ij} + \beta_1 y_{ij} + \beta_2 s_{ij} + \beta_3 x_{ij} + \epsilon_{ij} > 0)
+\]
+
+\[
+E[w_{ij}^1 | h_j, y_{ij}^1, s_{ij}^1, x_{ij}^1, \hat{p}_z] = h_j + \beta_{1,1} y_{ij}^1 + \beta_{2,1} s_{ij}^1 + \beta_{3,1} x_{ij}^1 + \delta_1 \epsilon_{ij}^1
+\]
+
+\[
+E[w_{ij}^0 | h_j, y_{ij}^0, s_{ij}^0, x_{ij}^0, \hat{p}_z] = h_j + \beta_{1,0} y_{ij}^0 + \beta_{2,0} s_{ij}^0 + \beta_{3,1} x_{ij}^0 + \delta_0 \epsilon_{ij}^0
+\]
+
+By employing a combination of regression modeling and the Roy model regression, the research aims to fully embody wait time discrepancies based on difference in choice to forgo the closer hospital or not.
+
+
+## Results
+
+Applying these models, the authors found that patients residing in the most deprived fifths of small areas experience a 35% longer wait time compared to those in the least deprived fifths. In 2002, the wait time for coronary artery bypass grafting (CABG) was 53% longer for these patients, while for percutaneous coronary intervention (PCI), it was 35% longer. These numbers decreased to 9.5% and 15% respectively by 2011. Further, the Roy regression models allowed for the authors to determine that waiting time inequalities are not primarily due to choice of hospital or type of treatment for the life-threatening condition investigated. Only up to 12% of the overall waiting time gradient was found to be due to patient choice in 2002.  Therefore, it is clear that the difference in wait time across socioeconomic status is not accounted for by patient choice and instead must be due to bias by providers or advantages inherent to those of higher SES. 
+
+## Conclusions and considerations
+
+Despite their significant findings, the authors acknowledge within the paper that their estimates of choice are conservatively low because they attribute all choices regarding going to the nearest hospital to preference rather than the reality that there may be other constraints beyond preference causing unequal opportunity for those of lower SES to travel to the further away hospital. Hence, the wait time gradient may be more explained by choice, but that choice is only for those of higher SES. Thus, the remaining difference in wait time has been defined by economists ^[Balsa, A.I., McGuire, T.G., 2001. Statistical discrimination in healthcare. J. Health
+Econ. 20 (6), 881–907.
+]  as  “how an agent (an employer, a doctor), without intending to discriminate, might apply an otherwise reasonable decision making rule (pay according to productivity, treat according to need), that in practice leads to unequal treatment of members of two [ethnic] groups.” Hence, this remaining difference must be further analyzed which is what I will aim to do in the final project of this paper.
+
+To further drive home the importance of  finding and eradicating disparities in access to healthcare,  it is possible for disparities in healthcare to proliferate more or go unnoticed for longer than in the labor market. For example, in the labor market it is wage that is the resource exchanged from the employer to employee; therefore more wage being given to a white employee, for example, is balanced by less being given to an employee of color. Instead, in healthcare, the treatment must be a match for the patient. Hence, giving more of the drug to a patient does not help that patient, nor does it balance out giving too little. Further, spending too little time with a patient or mismatch of doctor to patient may lead to the wrong prescription in the first place. Thus, time with the patient and proper treatment are therefore both factors in equal-access healthcare requiring more complex policy mandates.
+
+Access to healthcare is not only an economic and societal issue, but also an ethical issue. With regards to normative considerations in the issue of accessibility to healthcare, perspectives from both Immanuel Kant and John Rawls can be applied. Immanuel Kant is a philosopher whose doctrines fall under deontology, the study of the nature of duty and obligation. One of his main  doctrines in such duty ethics is the categorical imperative, which is two-fold. Firstly, the categorical imperative requires that individuals are treated as ends and not means. Second, the categorical imperative requires that the action taken is only justifiable such that one can universalize it. When observing a gradient in healthcare access across socioeconomic status, it is clear that individuals are being discriminated against or that within the current healthcare system (UK in this case) there are imperfect agents who are not viewing each patient as an end. Instead, there are other factors that are causing individuals of identical need to be prioritized over others. Further, the quicker treatment times reflected in those of higher SES are not universalized. Thus, a gradient in wait times across SES groups directly violates the categorical imperative of what a healthcare system, according to Kant, is obligated to provide. 
+
+While Kant is known for his duty-based ethics, John Rawls writes from a lens of justice ethics. Rawls paints the concept of justice as fairness and defines a difference principle that I will apply to this case as well. The difference principle suggests that in situations where disparities exist, resources should be allocated to protect the most vulnerable. If we were to define disparity as difference in SES grouping, the outcomes of this paper directly violate this difference principle because those of lower socioeconomic status are  experiencing worse accessibility to healthcare than those of higher SES. It is worth clarifying that in healthcare, it is not that one group should have access over another, but instead that if there is a disparity existing that is disproportionately affecting the less privileged, then the difference principle has been violated. 
+
+Hence, quantifying where bias may exist within the hospital that is quantified in the remaining gradient of wait time across socioeconomic groups is not only necessary to further the mathematical economic model, but also required to dutifully and justly address the moral issue of unequal access to healthcare. 
+
+
+
+
